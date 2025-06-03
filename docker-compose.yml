@@ -8,8 +8,6 @@ services:
       - 8000
     environment:
       - BASE_PATH=/drugsback
-    depends_on:
-      - nginx
 
   nginx:
     image: nginx:1.25-alpine

@@ -21,6 +21,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /opt/drugsback
+            git config --global --add safe.directory /opt/drugsback
             git pull origin main
             docker compose down --remove-orphans
             docker compose up -d --build
