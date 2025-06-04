@@ -1,5 +1,5 @@
 import os
-from openai import OpenAI
+from openai import AsyncOpenAI
 
 # Загрузим переменные из .env
 from dotenv import load_dotenv
