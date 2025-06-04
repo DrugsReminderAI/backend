@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from backend.services.groq_client import ask_groq
 import logging
 
 logging.basicConfig(level=logging.INFO)
