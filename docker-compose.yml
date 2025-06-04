@@ -8,6 +8,7 @@ services:
       - 8000
     environment:
       - BASE_PATH=/drugsback
+      - GROQ_API_KEY=${GROQ_API_KEY}
     restart: unless-stopped
 
   nginx:
