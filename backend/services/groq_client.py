@@ -1,7 +1,7 @@
 import os
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
-from backend.services.memory import get_history, append_to_history
+from services.memory import get_history, append_to_history
 
 load_dotenv()
 
