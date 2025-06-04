@@ -16,5 +16,5 @@ class Message(BaseModel):
 async def receive(message: Message):
     logging.info(f"[{message.timestamp}] {message.username or message.user_id}: {message.text}")
     ai_reply = await ask_groq(message.text)
+    logging.info(f"[AI Reply] → {ai_reply}")
     return {"reply": ai_reply}
-logging.info(f"[AI Reply] → {ai_reply}")
