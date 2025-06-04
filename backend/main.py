@@ -12,4 +12,5 @@ class Message(BaseModel):
 @app.post("/api/chat")
 async def receive(message: Message):
     print(f"[{message.timestamp}] {message.username or message.user_id}: {message.text}")
-    return {"reply": f"Вы написали: {message.text}"}
+    ai_reply = await ask_groq(message.text)
+    return {"reply": ai_reply}
