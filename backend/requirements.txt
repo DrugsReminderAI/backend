@@ -4,6 +4,6 @@ pydantic
 openai
 python-dotenv
 requests
-yaml
+PyYAML
 python-telegram-bot==20.7
 aiohttp
