@@ -23,3 +23,9 @@ TEMPERATURE = 0.7
 
 # Serper API Key
 SERPER_API_KEY = os.getenv("SERPER_API_KEY")
+
+# Directory for schedules
+SCHEDULES_DIR = "schedules"
+
+# Bot token
+BOT_TOKEN = os.getenv("BOT_TOKEN")
