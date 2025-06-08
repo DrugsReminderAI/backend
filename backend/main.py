@@ -10,6 +10,8 @@ import os
 from config import BOT_TOKEN
 
 logging.basicConfig(level=logging.INFO)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("asyncio").setLevel(logging.WARNING)
 
 
 @asynccontextmanager
