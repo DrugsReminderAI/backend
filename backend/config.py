@@ -29,18 +29,20 @@ SYSTEM_PROMPT = (
 TOOLS = [
     {
         "type": "function",
-        "name": "search",
-        "description": "Поиск информации о лекарствах через гугл приемущественно на сайте https://www.vidal.ru/",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "query": {
-                    "type": "string",
-                    "description": "Текстовый запрос в поисковую систему",
-                }
+        "function": {
+            "name": "search",
+            "description": "Поиск информации о лекарствах через гугл приемущественно на сайте https://www.vidal.ru/",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "Текстовый запрос в поисковую систему",
+                    }
+                },
+                "required": ["query"],
+                "additionalProperties": False,
             },
-            "required": ["query"],
-            "additionalProperties": False,
         },
     }
 ]
