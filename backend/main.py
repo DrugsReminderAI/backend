@@ -40,5 +40,5 @@ async def handle_telegram_message(update: Update, context: ContextTypes.DEFAULT_
 
     ai_reply = await ask_groq(message_text, user_id)
 
-    reply = ai_reply or "✅ Принято, но без ответа."
+    reply = ai_reply or "✅ Принято, без ответа."
     await update.message.reply_text(reply)
