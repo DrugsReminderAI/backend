@@ -42,7 +42,9 @@ async def ask_groq(user_text: str, user_id: int) -> str:
                 append_to_history(
                     user_id, "assistant", None
                 )  # чтобы сохранить tool_call
-                append_to_history(user_id, "tool", result)
+                append_to_history(
+                    user_id, "tool", result, tool_call_id=tool_calls[0].id
+                )
             else:
                 unknown_response = f"⚠️ Неизвестная функция: {tool_call.function.name}"
                 append_to_history(user_id, "tool", unknown_response)
