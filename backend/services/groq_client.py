@@ -2,11 +2,12 @@ import os
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
 from services.memory import get_history, append_to_history
+from config import GROQ_API_KEY, GROQ_MODEL, SYSTEM_PROMPT, TEMPERATURE
 
 load_dotenv()
 
 client = AsyncOpenAI(
-    api_key=os.getenv("GROQ_API_KEY"),
+    api_key=GROQ_API_KEY,
     base_url="https://api.groq.com/openai/v1"
 )
 
@@ -15,6 +16,7 @@ SYSTEM_PROMPT = (
     "По указанным пользователем выписанным лекарствам и режиму их приема ты составляешь расписание и отправляешь напоминания: "
     "в 7:00 (утро), в 12:00 (обед), в 19:00 (вечер) и в 21:00 (ночь), если не сказано иное. "
     "Если пользователь не подтвердил приём, повторяешь напоминание каждые 30 минут."
+    ""
 )
 
 async def ask_groq(user_text: str, user_id: int) -> str:
@@ -27,9 +29,9 @@ async def ask_groq(user_text: str, user_id: int) -> str:
         append_to_history(user_id, "user", user_text)
 
         response = await client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model=GROQ_MODEL,
             messages=chat_history,
-            temperature=0.7
+            temperature=TEMPERATURE
         )
 
         ai_message = response.choices[0].message
