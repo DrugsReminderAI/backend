@@ -2,10 +2,17 @@ import requests
 import logging
 import os
 import yaml
+import asyncio
+from datetime import datetime, timedelta
+from telegram import Bot
+from config import BOT_TOKEN
+from datetime import datetime
+import pytz
 
 from config import SERPER_API_KEY, SCHEDULES_DIR
 
 logging.basicConfig(level=logging.INFO)
+bot = Bot(token=BOT_TOKEN)
 
 
 # Поиск в гугле
@@ -47,3 +54,45 @@ def save_med_schedule_to_yaml(user_id: int, schedule_data: dict):
         yaml.dump(schedule_data, file, allow_unicode=True)
 
     return filepath
+
+
+# Чтение расписания из файла
+def load_med_schedule_from_yaml(user_id: int) -> dict:
+    filepath = os.path.join(SCHEDULES_DIR, f"{user_id}.yml")
+
+    if not os.path.exists(filepath):
+        logging.warning(f"Файл расписания не найден для user_id={user_id}")
+        return {}
+
+    try:
+        with open(filepath, "r", encoding="utf-8") as file:
+            schedule_data = yaml.safe_load(file) or {}
+            return schedule_data
+    except Exception as e:
+        logging.error(f"Ошибка при чтении расписания: {str(e)}")
+        return {}
+
+
+# Таймер
+async def send_reminder_timer(user_id: int, time_str: str, medicine: str):
+    now = datetime.now()
+    target_time = datetime.strptime(time_str, "%H:%M").replace(
+        year=now.year, month=now.month, day=now.day
+    )
+
+    delay = (target_time - now).total_seconds()
+    await asyncio.sleep(delay)
+
+    try:
+        await bot.send_message(
+            chat_id=user_id, text=f"💊 Напоминание: пора принять {medicine}"
+        )
+    except Exception as e:
+        print(f"Ошибка при отправке напоминания: {e}")
+
+
+# Текущее время
+def get_moscow_time() -> str:
+    tz = pytz.timezone("Europe/Moscow")
+    now = datetime.now(tz)
+    return now.strftime("%H:%M")
