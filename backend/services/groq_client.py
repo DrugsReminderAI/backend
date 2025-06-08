@@ -19,50 +19,39 @@ async def ask_groq(user_text: str, user_id: int) -> str:
 
         append_to_history(user_id, "user", user_text)
 
-        response = await client.chat.completions.create(
-            model=GROQ_MODEL,
-            messages=chat_history,
-            temperature=TEMPERATURE,
-            tools=TOOLS,
-            tool_choice="auto",
-            parallel_tool_calls=True,
-        )
-
-        msg = response.choices[0].message
-        tool_calls = msg.tool_calls
-
-        # если пришёл вызов инструмента
-        if tool_calls:
-            tool_call = tool_calls[0]
-            if tool_call.function.name == "search":
-                args = json.loads(tool_call.function.arguments)
-                query = args.get("query")
-                result = search(query)
-
-                append_to_history(
-                    user_id, "assistant", None
-                )  # чтобы сохранить tool_call
-                append_to_history(
-                    user_id, "tool", result, tool_call_id=tool_calls[0].id
-                )
-            else:
-                unknown_response = f"⚠️ Неизвестная функция: {tool_call.function.name}"
-                append_to_history(user_id, "tool", unknown_response)
-                return unknown_response
-
-            # повторный запрос без tools
-            updated_history = get_history(user_id)
+        while True:
             response = await client.chat.completions.create(
-                model=GROQ_MODEL, messages=updated_history, temperature=TEMPERATURE
+                model=GROQ_MODEL,
+                messages=chat_history,
+                temperature=TEMPERATURE,
+                tools=TOOLS,
+                tool_choice="auto",
+                parallel_tool_calls=True,
             )
 
-            final_msg = response.choices[0].message
-            append_to_history(user_id, final_msg.role, final_msg.content)
-            return final_msg.content
+            msg = response.choices[0].message
+            append_to_history(user_id, msg.role, msg.content)
 
-        # обычный ответ
-        append_to_history(user_id, msg.role, msg.content)
-        return msg.content
+            tool_calls = msg.tool_calls
+            if not tool_calls:
+                return msg.content  # обычный ответ, выходим
+
+            for tool_call in tool_calls:
+                name = tool_call.function.name
+                args = json.loads(tool_call.function.arguments)
+
+                if name == "search":
+                    query = args.get("query")
+                    result = search(query)
+                else:
+                    result = f"⚠️ Неизвестная функция: {name}"
+
+                append_to_history(
+                    user_id,
+                    role="tool",
+                    content=result,
+                    tool_call_id=tool_call.id,
+                )
 
     except Exception as e:
         return f"⚠️ Ошибка запроса к Groq: {str(e)}"
