@@ -14,7 +14,7 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # Модель по умолчанию
 # GROQ_MODEL = "llama-3.3-70b-versatile"
-GROQ_MODEL = "whisper-large-v3"
+GROQ_MODEL = "llama-3.1-8b-instant"
 
 # Системный промпт
 SYSTEM_PROMPT = """
