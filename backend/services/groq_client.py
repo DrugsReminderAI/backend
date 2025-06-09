@@ -117,4 +117,5 @@ async def ask_groq(user_text: str, user_id: int) -> str:
             return msg.content
 
     except Exception as e:
+        logging.exception(f"Ошибка во время запроса к Groq:")
         return f"⚠️ Ошибка запроса к Groq: {str(e)}"
