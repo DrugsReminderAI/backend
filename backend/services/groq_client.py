@@ -3,7 +3,13 @@ from openai import AsyncOpenAI
 from dotenv import load_dotenv
 from services.memory import get_history, append_to_history
 from config import GROQ_API_KEY, GROQ_MODEL, SYSTEM_PROMPT, TEMPERATURE, TOOLS
-from services.functions import search
+from services.functions import (
+    search,
+    save_med_schedule_to_yaml,
+    load_med_schedule_from_yaml,
+    send_reminder_timer,
+    get_moscow_time,
+)
 
 load_dotenv()
 
@@ -56,8 +62,32 @@ async def ask_groq(user_text: str, user_id: int) -> str:
                     args = json.loads(tc.function.arguments)
 
                     if name == "search":
-                        query = args.get("query")
-                        result = search(query)
+                        result = search(args.get("query"))
+
+                    elif name == "save_med_schedule_to_yaml":
+                        result = save_med_schedule_to_yaml(
+                            user_id, args.get("schedule_data", {})
+                        )
+
+                    elif name == "load_med_schedule_from_yaml":
+                        result = load_med_schedule_from_yaml(user_id)
+
+                    elif name == "send_reminder_timer":
+                        # таймер асинхронный
+                        from asyncio import create_task
+
+                        create_task(
+                            send_reminder_timer(
+                                args.get("user_id"),
+                                args.get("time_str"),
+                                args.get("medicine"),
+                            )
+                        )
+                        result = "⏰ Напоминание будет отправлено"
+
+                    elif name == "get_moscow_time":
+                        result = get_moscow_time()
+
                     else:
                         result = f"⚠️ Неизвестная функция: {name}"
 
