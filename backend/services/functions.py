@@ -75,14 +75,16 @@ def load_med_schedule_from_yaml(user_id: int) -> dict:
 
 # Таймер
 async def send_reminder_timer(user_id: int, time_str: str, medicine: str):
-    now = datetime.now()
+    tz = pytz.timezone("Europe/Moscow")
+    now = datetime.now(tz)
     target_time = datetime.strptime(time_str, "%H:%M").replace(
         year=now.year, month=now.month, day=now.day
     )
 
     delay = (target_time - now).total_seconds()
     logging.info(
-        f"[TIMER] user_id={user_id}, medicine='{medicine}', delay={delay:.2f} сек (target={target_time})"
+        f"[TIMER] user_id={user_id}, medicine='{medicine}', delay={delay:.2f} сек "
+        f"(target={target_time.strftime('%Y-%m-%d %H:%M:%S %Z')}, now={now.strftime('%Y-%m-%d %H:%M:%S %Z')})"
     )
 
     await asyncio.sleep(delay)
