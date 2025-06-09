@@ -85,7 +85,7 @@ async def ask_groq(user_text: str, user_id: int) -> str:
 
                         create_task(
                             send_reminder_timer(
-                                args.get("user_id"),
+                                user_id,
                                 args.get("time_str"),
                                 args.get("medicine"),
                             )
