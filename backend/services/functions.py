@@ -78,7 +78,7 @@ async def send_reminder_timer(user_id: int, time_str: str, medicine: str):
     tz = pytz.timezone("Europe/Moscow")
     now = datetime.now(tz)
     target_time = datetime.strptime(time_str, "%H:%M").replace(
-        year=now.year, month=now.month, day=now.day, tzinfo=moscow
+        year=now.year, month=now.month, day=now.day, tzinfo=tz
     )
 
     delay = (target_time - now).total_seconds()
