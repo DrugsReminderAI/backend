@@ -14,7 +14,6 @@ from services.functions import (
 
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
-called_tools = set()
 
 client = AsyncOpenAI(api_key=GROQ_API_KEY, base_url="https://api.groq.com/openai/v1")
 
@@ -62,10 +61,6 @@ async def ask_groq(user_text: str, user_id: int) -> str:
 
                 for tc in tool_calls:
                     name = tc.function.name
-                    # Прерываем повторные вызовы
-                    if name in called_tools:
-                        return f"⚠️ Цикл вызовов функции '{name}' остановлен вручную"
-                    called_tools.add(name)
                     args = json.loads(tc.function.arguments)
 
                     logging.info(
