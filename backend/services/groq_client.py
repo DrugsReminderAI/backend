@@ -1,5 +1,6 @@
 import json
 import logging
+import yaml
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
 from services.memory import get_history, append_to_history
@@ -96,6 +97,9 @@ async def ask_groq(user_text: str, user_id: int) -> str:
 
                     else:
                         result = f"⚠️ Неизвестная функция: {name}"
+
+                    if not isinstance(result, str):
+                        result = yaml.dump(result, allow_unicode=True)
 
                     append_to_history(
                         user_id,
