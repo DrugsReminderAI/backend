@@ -81,12 +81,20 @@ async def send_reminder_timer(user_id: int, time_str: str, medicine: str):
     )
 
     delay = (target_time - now).total_seconds()
+    logging.info(
+        f"[TIMER] user_id={user_id}, medicine='{medicine}', delay={delay:.2f} сек (target={target_time})"
+    )
+
     await asyncio.sleep(delay)
 
     try:
-        await bot.send_message(
-            chat_id=user_id, text=f"💊 Напоминание: пора принять {medicine}"
+        message_text = f"💊 Напоминание: пора принять {medicine}"
+
+        logging.info(
+            f"[SEND] Отправка напоминания пользователю {user_id}: {message_text}"
         )
+        await bot.send_message(chat_id=user_id, text=message_text)
+
     except Exception as e:
         print(f"Ошибка при отправке напоминания: {e}")
 
