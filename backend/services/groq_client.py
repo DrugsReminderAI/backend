@@ -1,4 +1,5 @@
 import json
+import logging
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
 from services.memory import get_history, append_to_history
@@ -11,6 +12,7 @@ from services.functions import (
     get_moscow_time,
 )
 
+logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
 client = AsyncOpenAI(api_key=GROQ_API_KEY, base_url="https://api.groq.com/openai/v1")
@@ -60,6 +62,10 @@ async def ask_groq(user_text: str, user_id: int) -> str:
                 for tc in tool_calls:
                     name = tc.function.name
                     args = json.loads(tc.function.arguments)
+
+                    logging.info(
+                        f"[TOOL CALL] Вызов функции '{name}' с аргументами: {args}"
+                    )
 
                     if name == "search":
                         result = search(args.get("query"))
