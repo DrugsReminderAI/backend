@@ -13,8 +13,8 @@ SERPER_API_KEY = os.getenv("SERPER_API_KEY")
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # Модель по умолчанию
-# GROQ_MODEL = "llama-3.3-70b-versatile"
-GROQ_MODEL = "llama3-70b-8192"
+GROQ_MODEL = "llama-3.3-70b-versatile"
+# GROQ_MODEL = "llama3-70b-8192"
 
 # Системный промпт
 SYSTEM_PROMPT = """
