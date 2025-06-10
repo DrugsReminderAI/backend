@@ -5,10 +5,9 @@ import yaml
 import pytz
 from datetime import datetime, timedelta
 from telegram import Bot
-from config import BOT_TOKEN
-from datetime import datetime
+from backend.config import BOT_TOKEN
 from pytz import timezone
-from tasks import send_reminder_task
+from backend.tasks import send_reminder_task
 
 
 from config import SERPER_API_KEY, SCHEDULES_DIR

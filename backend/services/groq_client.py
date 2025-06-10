@@ -3,16 +3,16 @@ import logging
 import yaml
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
-from services.memory import get_history, append_to_history
-from config import GROQ_API_KEY, GROQ_MODEL, SYSTEM_PROMPT, TEMPERATURE, TOOLS
-from services.functions import (
+from backend.services.memory import get_history, append_to_history
+from backend.config import GROQ_API_KEY, GROQ_MODEL, SYSTEM_PROMPT, TEMPERATURE, TOOLS
+from backend.services.functions import (
     search,
     save_med_schedule_to_yaml,
     load_med_schedule_from_yaml,
     get_moscow_time,
     schedule_reminder,
 )
-from services.confirmation import confirm_medicine
+from backend.services.confirmation import confirm_medicine
 
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
