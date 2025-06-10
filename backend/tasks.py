@@ -1,5 +1,5 @@
 import logging
-from celery_app import celery_app
+from backend.celery_app import celery_app
 from telegram import Bot
 from config import BOT_TOKEN
 
