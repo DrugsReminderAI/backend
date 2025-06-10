@@ -77,9 +77,10 @@ def load_med_schedule_from_yaml(user_id: int) -> dict:
 async def send_reminder_timer(user_id: int, time_str: str, medicine: str):
     tz = pytz.timezone("Europe/Moscow")
     now = datetime.now(tz)
-    target_time = datetime.strptime(time_str, "%H:%M").replace(
-        year=now.year, month=now.month, day=now.day, tzinfo=tz
+    naive_target = datetime.strptime(time_str, "%H:%M").replace(
+        year=now.year, month=now.month, day=now.day
     )
+    target_time = tz.localize(naive_target)
 
     delay = (target_time - now).total_seconds()
     logging.info(
