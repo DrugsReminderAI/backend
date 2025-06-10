@@ -29,7 +29,7 @@ services:
   celery:
     build: .
     container_name: drugsback-celery
-    command: celery -A backend.celery_app worker --loglevel=info
+    command: celery -A celery_app worker --loglevel=info
     depends_on:
       - backend
       - redis
