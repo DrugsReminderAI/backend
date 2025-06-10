@@ -1,12 +1,10 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
 from contextlib import asynccontextmanager
 from backend.services.groq_client import ask_groq
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
 import logging
 import asyncio
-import os
 from backend.config import BOT_TOKEN
 
 logging.basicConfig(level=logging.INFO)

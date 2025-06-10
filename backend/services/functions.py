@@ -10,7 +10,7 @@ from pytz import timezone
 from backend.tasks import send_reminder_task
 
 
-from config import SERPER_API_KEY, SCHEDULES_DIR
+from backend.config import SERPER_API_KEY, SCHEDULES_DIR
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=BOT_TOKEN)
