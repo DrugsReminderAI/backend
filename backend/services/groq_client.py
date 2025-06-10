@@ -9,7 +9,6 @@ from services.functions import (
     search,
     save_med_schedule_to_yaml,
     load_med_schedule_from_yaml,
-    send_reminder_timer,
     get_moscow_time,
 )
 from services.confirmation import confirm_medicine, is_confirmed
@@ -82,19 +81,6 @@ async def ask_groq(user_text: str, user_id: int) -> str:
 
                     elif name == "load_med_schedule_from_yaml":
                         result = load_med_schedule_from_yaml(user_id)
-
-                    elif name == "send_reminder_timer":
-                        # таймер асинхронный
-                        from asyncio import create_task
-
-                        create_task(
-                            send_reminder_timer(
-                                user_id,
-                                args.get("time_str"),
-                                args.get("medicine"),
-                            )
-                        )
-                        result = "⏰ Напоминание будет отправлено"
 
                     elif name == "get_moscow_time":
                         result = get_moscow_time()
