@@ -103,13 +103,8 @@ TOOLS = [
             "description": "Читает текущее расписание приёма лекарств пользователя из YAML-файла по его user_id. Если файл отсутствует или повреждён, возвращает пустой словарь.",
             "parameters": {
                 "type": "object",
-                "properties": {
-                    "user_id": {
-                        "type": "integer",
-                        "description": "Уникальный идентификатор пользователя Telegram",
-                    }
-                },
-                "required": ["user_id"],
+                "properties": {},
+                "required": [],
                 "additionalProperties": False,
             },
         },
@@ -122,10 +117,6 @@ TOOLS = [
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "user_id": {
-                        "type": "integer",
-                        "description": "Уникальный идентификатор пользователя Telegram",
-                    },
                     "time_str": {
                         "type": "string",
                         "description": "Время в формате HH:MM по часовому поясу сервера, когда нужно отправить напоминание",
@@ -135,7 +126,7 @@ TOOLS = [
                         "description": "Название лекарства, о приёме которого нужно напомнить",
                     },
                 },
-                "required": ["user_id", "time_str", "medicine"],
+                "required": ["time_str", "medicine"],
                 "additionalProperties": False,
             },
         },
