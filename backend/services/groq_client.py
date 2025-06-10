@@ -28,11 +28,6 @@ async def ask_groq(user_text: str, user_id: int) -> str:
 
         append_to_history(user_id, "user", user_text)
 
-        confirm_medicine(user_id, "21:00", "аспирин")
-        is_confirmed(user_id, "20:00", "аспирин")
-        is_confirmed(user_id, "21:00", "пипирен")
-        is_confirmed("user_id", "21:00", "аспирин")
-
         while True:
             response = await client.chat.completions.create(
                 model=GROQ_MODEL,
