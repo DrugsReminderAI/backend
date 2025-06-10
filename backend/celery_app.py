@@ -13,5 +13,4 @@ celery_app = Celery(
 )
 
 celery_app.conf.timezone = "Europe/Moscow"
-
-from backend.tasks import send_reminder_task
+celery_app.autodiscover_tasks(["backend"])
