@@ -113,21 +113,12 @@ TOOLS = [
     {
         "type": "function",
         "function": {
-            "name": "send_reminder_timer",
-            "description": "Запускает таймер для отправки напоминания о приёме лекарства пользователю в заданное время. Используется для разовой отправки сообщения в будущем.",
+            "name": "get_moscow_time",
+            "description": "Возвращает текущее время по московскому часовому поясу в формате HH:MM. Используется для ориентации по локальному времени пользователя, если не указан часовой пояс явно. Функция не должна вызываться повторно, если результат уже получен, даже если он недостаточно точен",
             "parameters": {
                 "type": "object",
-                "properties": {
-                    "time_str": {
-                        "type": "string",
-                        "description": "Время в формате HH:MM по часовому поясу сервера, когда нужно отправить напоминание",
-                    },
-                    "medicine": {
-                        "type": "string",
-                        "description": "Название лекарства, о приёме которого нужно напомнить",
-                    },
-                },
-                "required": ["time_str", "medicine"],
+                "properties": {},
+                "required": [],
                 "additionalProperties": False,
             },
         },
@@ -135,12 +126,55 @@ TOOLS = [
     {
         "type": "function",
         "function": {
-            "name": "get_moscow_time",
-            "description": "Возвращает текущее время по московскому часовому поясу в формате HH:MM. Используется для ориентации по локальному времени пользователя, если не указан часовой пояс явно. Функция не должна вызываться повторно, если результат уже получен, даже если он недостаточно точен",
+            "name": "confirm_medicine",
+            "description": (
+                "Подтверждает или отменяет факт приёма лекарства пользователем. "
+                "Используется, когда пользователь сообщает, что он принял или отменяет подтверждение приёма препарата. "
+                "Подтверждение сохраняется в кэше на 24 часа."
+            ),
             "parameters": {
                 "type": "object",
-                "properties": {},
-                "required": [],
+                "properties": {
+                    "time_str": {
+                        "type": "string",
+                        "description": "Время приёма лекарства в формате HH:MM",
+                    },
+                    "medicine": {
+                        "type": "string",
+                        "description": "Название лекарства",
+                    },
+                    "is_confirm": {
+                        "type": "boolean",
+                        "description": "True — подтверждение приёма, False — отмена подтверждения",
+                    },
+                },
+                "required": ["user_id", "time_str", "medicine", "is_confirm"],
+                "additionalProperties": False,
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "schedule_reminder",
+            "description": (
+                "Запланировать напоминание о приёме лекарства через Celery. "
+                "Время округляется до следующего дня, если указанный момент уже прошёл. "
+                "Функция не проверяет подтверждение приёма — просто ставит задачу на исполнение."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "time_str": {
+                        "type": "string",
+                        "description": "Время в формате HH:MM по Москве, когда нужно напомнить",
+                    },
+                    "medicine": {
+                        "type": "string",
+                        "description": "Название лекарства, которое нужно напомнить принять",
+                    },
+                },
+                "required": ["user_id", "time_str", "medicine"],
                 "additionalProperties": False,
             },
         },
