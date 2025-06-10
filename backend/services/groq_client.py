@@ -10,8 +10,9 @@ from services.functions import (
     save_med_schedule_to_yaml,
     load_med_schedule_from_yaml,
     get_moscow_time,
+    schedule_reminder,
 )
-from services.confirmation import confirm_medicine, is_confirmed
+from services.confirmation import confirm_medicine
 
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
@@ -81,6 +82,23 @@ async def ask_groq(user_text: str, user_id: int) -> str:
 
                     elif name == "get_moscow_time":
                         result = get_moscow_time()
+
+                    elif name == "confirm_medicine":
+                        confirm_medicine(
+                            user_id=user_id,
+                            time_str=args.get("time_str"),
+                            medicine=args.get("medicine"),
+                            is_confirm=args.get("is_confirm", True),
+                        )
+                        result = "✅ Подтверждение обработано"
+
+                    elif name == "schedule_reminder":
+                        schedule_reminder(
+                            user_id=user_id,
+                            time_str=args.get("time_str"),
+                            medicine=args.get("medicine"),
+                        )
+                        result = "📆 Напоминание запланировано"
 
                     else:
                         result = f"⚠️ Неизвестная функция: {name}"
