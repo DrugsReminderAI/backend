@@ -1,9 +1,15 @@
+import os
 from celery import Celery
+from dotenv import load_dotenv
+
+load_dotenv()
+
+redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
 celery_app = Celery(
     "drugsreminder",
-    broker="redis://localhost:6379/0",  # Redis как брокер
-    backend="redis://localhost:6379/0",  # (опционально) хранить результаты
+    broker=redis_url,
+    backend=redis_url,
 )
 
 celery_app.conf.timezone = "Europe/Moscow"
