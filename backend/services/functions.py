@@ -2,12 +2,14 @@ import requests
 import logging
 import os
 import yaml
-import asyncio
+import pytz
 from datetime import datetime, timedelta
 from telegram import Bot
 from config import BOT_TOKEN
 from datetime import datetime
-import pytz
+from pytz import timezone
+from tasks import send_reminder_task
+
 
 from config import SERPER_API_KEY, SCHEDULES_DIR
 
@@ -73,33 +75,25 @@ def load_med_schedule_from_yaml(user_id: int) -> dict:
         return {}
 
 
-# Таймер
-async def send_reminder_timer(user_id: int, time_str: str, medicine: str):
-    tz = pytz.timezone("Europe/Moscow")
+# Добавление задачи в напоминания
+def schedule_reminder(user_id: int, time_str: str, medicine: str):
+    tz = timezone("Europe/Moscow")
     now = datetime.now(tz)
+
     naive_target = datetime.strptime(time_str, "%H:%M").replace(
         year=now.year, month=now.month, day=now.day
     )
     target_time = tz.localize(naive_target)
 
-    delay = (target_time - now).total_seconds()
+    if target_time < now:
+        target_time += timedelta(days=1)
+
     logging.info(
-        f"[TIMER] user_id={user_id}, medicine='{medicine}', delay={delay:.2f} сек "
-        f"(target={target_time.strftime('%Y-%m-%d %H:%M:%S %Z')}, now={now.strftime('%Y-%m-%d %H:%M:%S %Z')})"
+        f"[SCHEDULE] user_id={user_id}, medicine='{medicine}', time={target_time}"
     )
 
-    await asyncio.sleep(delay)
-
-    try:
-        message_text = f"💊 Напоминание: пора принять {medicine}"
-
-        logging.info(
-            f"[SEND] Отправка напоминания пользователю {user_id}: {message_text}"
-        )
-        await bot.send_message(chat_id=user_id, text=message_text)
-
-    except Exception as e:
-        print(f"Ошибка при отправке напоминания: {e}")
+    # Отложенный запуск задачи через Celery
+    send_reminder_task.apply_async(args=[user_id, medicine], eta=target_time)
 
 
 # Текущее время

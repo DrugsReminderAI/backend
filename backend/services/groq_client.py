@@ -12,6 +12,7 @@ from services.functions import (
     send_reminder_timer,
     get_moscow_time,
 )
+from services.confirmation import confirm_medicine, is_confirmed
 
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
@@ -27,6 +28,9 @@ async def ask_groq(user_text: str, user_id: int) -> str:
             append_to_history(user_id, "system", SYSTEM_PROMPT)
 
         append_to_history(user_id, "user", user_text)
+
+        confirm_medicine(user_id, "21:00", "аспирин")
+        is_confirmed(user_id, "21:00", "аспирин")
 
         while True:
             response = await client.chat.completions.create(
