@@ -25,3 +25,15 @@ services:
     image: redis:7-alpine
     container_name: drugsback-redis
     restart: unless-stopped
+
+  celery:
+    build: .
+    container_name: drugsback-celery
+    command: celery -A celery_app worker --loglevel=info
+    depends_on:
+      - backend
+      - redis
+    volumes:
+      - .:/app
+    env_file:
+      - .env
