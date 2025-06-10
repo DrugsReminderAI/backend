@@ -1,7 +1,7 @@
 import logging
-from backend.celery_app import celery_app
+from celery_app import celery_app
 from telegram import Bot
-from backend.config import BOT_TOKEN
+from config import BOT_TOKEN
 
 bot = Bot(token=BOT_TOKEN)
 
