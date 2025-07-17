@@ -80,9 +80,7 @@ async def ask_groq(user_text: str, user_id: int) -> str:
                         result = search(args.get("query"))
 
                     elif name == "save_med_schedule_to_yaml":
-                        result = save_med_schedule_to_yaml(
-                            user_id, args.get("schedule_data", {})
-                        )
+                        result = save_med_schedule_to_yaml(user_id, args)
 
                     elif name == "load_med_schedule_from_yaml":
                         result = load_med_schedule_from_yaml(user_id)
