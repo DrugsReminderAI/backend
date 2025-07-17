@@ -37,7 +37,6 @@ async def ask_groq(user_text: str, user_id: int) -> str:
         append_to_history(user_id, "user", user_text)
 
         while True:
-            logging.info(f"[OPENAI] Используется модель: {OPENAI_MODEL}")
             response = await client.chat.completions.create(
                 model=OPENAI_MODEL,
                 messages=chat_history,
