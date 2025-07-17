@@ -9,12 +9,18 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 # Serper API Key
 SERPER_API_KEY = os.getenv("SERPER_API_KEY")
 
+# OpenAI API Key
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
 # Bot token
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # Модель по умолчанию
 GROQ_MODEL = "llama-3.3-70b-versatile"
 # GROQ_MODEL = "llama3-70b-8192"
+
+# OpenAI model
+OPENAI_MODEL = "gpt-4.1-mini-2025-04-14"
 
 # Системный промпт
 SYSTEM_PROMPT = """

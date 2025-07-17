@@ -4,7 +4,14 @@ import yaml
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
 from backend.services.memory import get_history, append_to_history
-from backend.config import GROQ_API_KEY, GROQ_MODEL, SYSTEM_PROMPT, TEMPERATURE, TOOLS
+from backend.config import (
+    GROQ_API_KEY,
+    GROQ_MODEL,
+    SYSTEM_PROMPT,
+    TEMPERATURE,
+    TOOLS,
+    OPENAI_API_KEY,
+)
 from backend.services.functions import (
     search,
     save_med_schedule_to_yaml,
@@ -17,7 +24,8 @@ from backend.services.confirmation import confirm_medicine
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
-client = AsyncOpenAI(api_key=GROQ_API_KEY, base_url="https://api.groq.com/openai/v1")
+# client = AsyncOpenAI(api_key=GROQ_API_KEY, base_url="https://api.groq.com/openai/v1")
+client = AsyncOpenAI(api_key=OPENAI_API_KEY)
 
 
 async def ask_groq(user_text: str, user_id: int) -> str:
