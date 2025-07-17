@@ -11,6 +11,7 @@ from backend.config import (
     TEMPERATURE,
     TOOLS,
     OPENAI_API_KEY,
+    OPENAI_MODEL,
 )
 from backend.services.functions import (
     search,
@@ -39,7 +40,7 @@ async def ask_groq(user_text: str, user_id: int) -> str:
 
         while True:
             response = await client.chat.completions.create(
-                model=GROQ_MODEL,
+                model=OPENAI_MODEL,
                 messages=chat_history,
                 temperature=TEMPERATURE,
                 tools=TOOLS,
