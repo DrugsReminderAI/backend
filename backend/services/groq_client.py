@@ -5,8 +5,6 @@ from openai import AsyncOpenAI
 from dotenv import load_dotenv
 from backend.services.memory import get_history, append_to_history
 from backend.config import (
-    GROQ_API_KEY,
-    GROQ_MODEL,
     SYSTEM_PROMPT,
     TEMPERATURE,
     TOOLS,
@@ -39,6 +37,7 @@ async def ask_groq(user_text: str, user_id: int) -> str:
         append_to_history(user_id, "user", user_text)
 
         while True:
+            logging.info(f"[OPENAI] Используется модель: {OPENAI_MODEL}")
             response = await client.chat.completions.create(
                 model=OPENAI_MODEL,
                 messages=chat_history,
