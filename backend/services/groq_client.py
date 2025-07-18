@@ -17,6 +17,7 @@ from backend.services.functions import (
     load_med_schedule_from_yaml,
     get_moscow_time,
     schedule_reminder,
+    clear_reminders_for_user,
 )
 from backend.services.confirmation import confirm_medicine
 
@@ -98,12 +99,11 @@ async def ask_groq(user_text: str, user_id: int) -> str:
                         result = "✅ Подтверждение обработано"
 
                     elif name == "schedule_reminder":
-                        schedule_reminder(
-                            user_id=user_id,
-                            time_str=args.get("time_str"),
-                            medicine=args.get("medicine"),
-                        )
-                        result = "📆 Напоминание запланировано"
+                        schedule = load_med_schedule_from_yaml(user_id)
+                        clear_reminders_for_user(user_id)
+                        for time_str, meds in schedule.items():
+                            schedule_reminder(user_id, time_str, meds)
+                        result = "📆 Все напоминания обновлены"
 
                     else:
                         result = f"⚠️ Неизвестная функция: {name}"

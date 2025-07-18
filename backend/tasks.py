@@ -12,7 +12,7 @@ async def send_async_message(user_id: int, text: str):
 
 
 @celery_app.task
-def send_reminder_task(user_id: int, medicine: str):
+def send_reminder_task(user_id: int, medicine: list[str]):
     message_text = f"💊 Напоминание: пора принять {medicine}"
     logging.info(f"[CELERY SEND] {user_id}: {message_text}")
     try:

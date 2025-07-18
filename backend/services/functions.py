@@ -8,6 +8,7 @@ from telegram import Bot
 from backend.config import BOT_TOKEN
 from pytz import timezone
 from backend.tasks import send_reminder_task
+from celery.task.control import revoke
 
 
 from backend.config import SERPER_API_KEY, SCHEDULES_DIR
@@ -74,8 +75,20 @@ def load_med_schedule_from_yaml(user_id: int) -> dict:
         return {}
 
 
+# Удаление всех задач юзера
+def clear_reminders_for_user(user_id: int):
+    for hour in range(24):
+        for minute in range(0, 60, 1):  # перебор всех возможных времён
+            time_str = f"{hour:02}:{minute:02}"
+            task_id = f"user-{user_id}-{time_str}"
+            try:
+                revoke(task_id, terminate=True)
+            except Exception:
+                pass  # игнорируем, если такой задачи не было
+
+
 # Добавление задачи в напоминания
-def schedule_reminder(user_id: int, time_str: str, medicine: str):
+def schedule_reminder(user_id: int, time_str: str, medicines: list[str]):
     tz = timezone("Europe/Moscow")
     now = datetime.now(tz)
 
@@ -88,11 +101,13 @@ def schedule_reminder(user_id: int, time_str: str, medicine: str):
         target_time += timedelta(days=1)
 
     logging.info(
-        f"[SCHEDULE] user_id={user_id}, medicine='{medicine}', time={target_time}"
+        f"[SCHEDULE] user_id={user_id}, medicine='{medicines}', time={target_time}"
     )
 
     # Отложенный запуск задачи через Celery
-    send_reminder_task.apply_async(args=[user_id, medicine], eta=target_time)
+    send_reminder_task.apply_async(
+        args=[user_id, medicines], eta=target_time, task_id=f"user-{user_id}-{time_str}"
+    )
 
 
 # Текущее время
