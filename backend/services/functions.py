@@ -8,7 +8,7 @@ from telegram import Bot
 from backend.config import BOT_TOKEN
 from pytz import timezone
 from backend.tasks import send_reminder_task
-from celery.task.control import revoke
+from backend.celery_app import celery_app
 
 
 from backend.config import SERPER_API_KEY, SCHEDULES_DIR
@@ -82,7 +82,7 @@ def clear_reminders_for_user(user_id: int):
             time_str = f"{hour:02}:{minute:02}"
             task_id = f"user-{user_id}-{time_str}"
             try:
-                revoke(task_id, terminate=True)
+                celery_app.control.revoke(task_id, terminate=True)
             except Exception:
                 pass  # игнорируем, если такой задачи не было
 
