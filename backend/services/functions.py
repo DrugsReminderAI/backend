@@ -78,15 +78,17 @@ def load_med_schedule_from_yaml(user_id: int) -> dict:
 
 # Удаление всех задач юзера
 def clear_reminders_for_user(user_id: int):
-    for hour in range(24):
-        for minute in range(0, 60, 1):  # перебор всех возможных времён
-            time_str = f"{hour:02}:{minute:02}"
-            task_id = f"user-{user_id}-{time_str}"
-            try:
-                celery_app.control.revoke(task_id, terminate=True)
-                logging.info(f"[REVOKE] {task_id} отозван")
-            except Exception:
-                pass  # игнорируем, если такой задачи не было
+    task_ids = [
+        f"user-{user_id}-{hour:02}:{minute:02}"
+        for hour in range(24)
+        for minute in range(60)
+    ]
+
+    try:
+        celery_app.control.revoke(task_ids, terminate=True)
+        logging.info(f"[REVOKE] Отозваны задачи: {len(task_ids)} для user_id={user_id}")
+    except Exception as e:
+        logging.warning(f"[REVOKE] Ошибка отзыва задач: {e}")
 
 
 # Добавление задачи в напоминания
