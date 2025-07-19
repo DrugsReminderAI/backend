@@ -10,6 +10,7 @@ from backend.config import BOT_TOKEN
 from pytz import timezone
 from backend.tasks import send_reminder_task
 from backend.celery_app import celery_app
+from celery.result import AsyncResult
 
 
 from backend.config import SERPER_API_KEY, SCHEDULES_DIR
@@ -87,7 +88,8 @@ def clear_reminders_for_user(user_id: int):
     try:
         celery_app.control.revoke(task_ids, terminate=True)
         logging.info(f"[REVOKE] Отозваны задачи: {len(task_ids)} для user_id={user_id}")
-        celery_app.result.AsyncResult(task_ids, app=celery_app).forget()
+        for task_id in task_ids:
+            AsyncResult(task_id, app=celery_app).forget()
     except Exception as e:
         logging.warning(f"[REVOKE] Ошибка отзыва задач: {e}")
 
