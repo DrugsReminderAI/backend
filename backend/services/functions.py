@@ -83,6 +83,7 @@ def clear_reminders_for_user(user_id: int):
             task_id = f"user-{user_id}-{time_str}"
             try:
                 celery_app.control.revoke(task_id, terminate=True)
+                logging.info(f"[REVOKE] {task_id} отозван")
             except Exception:
                 pass  # игнорируем, если такой задачи не было
 
@@ -108,6 +109,13 @@ def schedule_reminder(user_id: int, time_str: str, medicines: list[str]):
     send_reminder_task.apply_async(
         args=[user_id, medicines], eta=target_time, task_id=f"user-{user_id}-{time_str}"
     )
+
+
+def refresh_reminders(user_id: int):
+    clear_reminders_for_user(user_id)
+    schedule = load_med_schedule_from_yaml(user_id)
+    for time_str, meds in schedule.items():
+        schedule_reminder(user_id, time_str, meds)
 
 
 # Текущее время
