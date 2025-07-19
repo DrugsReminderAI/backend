@@ -113,7 +113,7 @@ def schedule_reminder(user_id: int, time_str: str, medicines: list[str]):
 
 
 def refresh_reminders(user_id: int):
-    clear_reminders_for_user(user_id)
+    # clear_reminders_for_user(user_id)
     time.sleep(0.5)
     schedule = load_med_schedule_from_yaml(user_id)
     for time_str, meds in schedule.items():
