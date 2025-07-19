@@ -1,7 +1,6 @@
 import json
 import logging
 import yaml
-import asyncio
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
 from backend.services.memory import get_history, append_to_history
@@ -99,7 +98,7 @@ async def ask_groq(user_text: str, user_id: int) -> str:
                         result = "✅ Подтверждение обработано"
 
                     elif name == "schedule_reminder":
-                        asyncio.run(refresh_reminders(user_id))
+                        refresh_reminders(user_id)
                         result = "📆 Все напоминания обновлены"
 
                     else:
