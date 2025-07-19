@@ -13,7 +13,12 @@ async def send_async_message(user_id: int, text: str):
 
 @celery_app.task
 def send_reminder_task(user_id: int, medicine: list[str]):
-    message_text = f"💊 Напоминание: пора принять {medicine}"
+    if isinstance(medicine, list):
+        medicine_str = ", ".join(medicine)
+    else:
+        medicine_str = str(medicine)
+
+    message_text = f"💊 Напоминание: пора принять {medicine_str}"
     logging.info(f"[CELERY SEND] {user_id}: {message_text}")
     try:
         asyncio.run(send_async_message(user_id, message_text))
