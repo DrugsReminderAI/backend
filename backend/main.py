@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from backend.services.groq_client import ask_groq
 from backend.services.yandex_stt import transcribe_oggopus
 from telegram import Update
+from telegram.error import BadRequest, TimedOut, RetryAfter
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
 import logging
 import asyncio
@@ -46,10 +47,35 @@ async def handle_telegram_message(update: Update, context: ContextTypes.DEFAULT_
     user_id = user.id
     timestamp = update.message.date.isoformat()
 
-    ai_reply = await ask_groq(message_text, user_id)
+    placeholder = await update.message.reply_text("🤔 Думаем...")
 
-    reply = ai_reply or "✅ Принято, без ответа."
-    await update.message.reply_text(reply)
+    try:
+        # 2) запрос к LLM
+        ai_reply = await ask_groq(message_text, user_id)
+        reply = ai_reply or "✅ Принято, без ответа."
+
+        # 3) редактируем заглушку
+        await placeholder.edit_text(reply)
+
+    except (RetryAfter, TimedOut):
+        # Telegram притормозил — отправим новое сообщение
+        await update.message.reply_text("⏳ Сервер отвечает дольше обычного...")
+        try:
+            await update.message.reply_text(
+                ai_reply if "ai_reply" in locals() and ai_reply else "✅ Принято."
+            )
+        except Exception:
+            pass
+
+    except BadRequest as e:
+        # Например, сообщение уже удалено/устарело — шлём отдельным
+        await update.message.reply_text(
+            ai_reply if "ai_reply" in locals() and ai_reply else f"⚠️ {e}"
+        )
+
+    except Exception as e:
+        # на всякий случай
+        await update.message.reply_text(f"⚠️ Ошибка обработки запроса: {e}")
 
 
 async def handle_voice_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -57,7 +83,7 @@ async def handle_voice_message(update: Update, context: ContextTypes.DEFAULT_TYP
     user_id = user.id
     voice = update.message.voice
 
-    # Синхронный STT надёжно тянет короткие сообщения; ограничим до ~60с
+    # ограничим до ~60с
     if voice and voice.duration and voice.duration > 60:
         await update.message.reply_text(
             "⏱️ Голосовое длиннее 60 сек — укороти, пожалуйста."
@@ -69,7 +95,6 @@ async def handle_voice_message(update: Update, context: ContextTypes.DEFAULT_TYP
 
         # Скачаем в память
         buf = io.BytesIO()
-        # В PTB 20.7 доступен download_to_memory; если у тебя другая минорная — замени на download(out=buf)
         await tg_file.download_to_memory(out=buf)
         audio_bytes = buf.getvalue()
 
@@ -81,7 +106,6 @@ async def handle_voice_message(update: Update, context: ContextTypes.DEFAULT_TYP
             )
             return
 
-        # Дальше — как обычный текст в твой ИИ-пайплайн
         ai_reply = await ask_groq(text, user_id)
         reply = ai_reply or "✅ Принято, без ответа."
         await update.message.reply_text(f"🎤 Распознал: «{text}»\n\n{reply}")
