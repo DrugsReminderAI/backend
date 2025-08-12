@@ -22,6 +22,10 @@ GROQ_MODEL = "llama-3.3-70b-versatile"
 # OpenAI model
 OPENAI_MODEL = "gpt-5"
 
+# Yandex SpeechKit
+YANDEX_API_KEY = os.getenv("YANDEX_API_KEY")
+YANDEX_STT_LANG = os.getenv("YANDEX_STT_LANG", "ru-RU")
+
 # Системный промпт
 SYSTEM_PROMPT = """
 Ты — честный и заботливый ИИ-помощник, который помогает пользователю соблюдать режим приёма лекарств.
@@ -170,9 +174,6 @@ TOOLS = [
         },
     },
 ]
-
-# Темепература
-TEMPERATURE = 0.7
 
 # Directory for schedules
 SCHEDULES_DIR = "schedules"
