@@ -25,6 +25,7 @@ OPENAI_MODEL = "gpt-5"
 # Yandex SpeechKit
 YANDEX_API_KEY = os.getenv("YANDEX_API_KEY")
 YANDEX_STT_LANG = os.getenv("YANDEX_STT_LANG", "ru-RU")
+YANDEX_FOLDER_ID = os.getenv("YANDEX_FOLDER_ID")
 
 # Системный промпт
 SYSTEM_PROMPT = """
