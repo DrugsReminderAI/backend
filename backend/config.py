@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Переменные окружения
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+# GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 # Serper API Key
 SERPER_API_KEY = os.getenv("SERPER_API_KEY")
@@ -20,7 +20,7 @@ GROQ_MODEL = "llama-3.3-70b-versatile"
 # GROQ_MODEL = "llama3-70b-8192"
 
 # OpenAI model
-OPENAI_MODEL = "gpt-4.1-mini-2025-04-14"
+OPENAI_MODEL = "gpt-5"
 
 # Системный промпт
 SYSTEM_PROMPT = """
