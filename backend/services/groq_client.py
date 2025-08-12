@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 from backend.services.memory import get_history, append_to_history
 from backend.config import (
     SYSTEM_PROMPT,
-    TEMPERATURE,
     TOOLS,
     OPENAI_API_KEY,
     OPENAI_MODEL,
