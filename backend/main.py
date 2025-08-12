@@ -17,7 +17,7 @@ logging.getLogger("asyncio").setLevel(logging.WARNING)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Запуск Telegram-бота
+
     async def run_bot():
         app_bot = ApplicationBuilder().token(BOT_TOKEN).build()
         app_bot.add_handler(
@@ -47,18 +47,17 @@ async def handle_telegram_message(update: Update, context: ContextTypes.DEFAULT_
     user_id = user.id
     timestamp = update.message.date.isoformat()
 
-    placeholder = await update.message.reply_text("🤔 Думаем...")
+    placeholder = await update.message.reply_text(
+        "🤔 Ясно... надо подумать... минутку..."
+    )
 
     try:
-        # 2) запрос к LLM
         ai_reply = await ask_groq(message_text, user_id)
         reply = ai_reply or "✅ Принято, без ответа."
 
-        # 3) редактируем заглушку
         await placeholder.edit_text(reply)
 
     except (RetryAfter, TimedOut):
-        # Telegram притормозил — отправим новое сообщение
         await update.message.reply_text("⏳ Сервер отвечает дольше обычного...")
         try:
             await update.message.reply_text(
@@ -74,7 +73,6 @@ async def handle_telegram_message(update: Update, context: ContextTypes.DEFAULT_
         )
 
     except Exception as e:
-        # на всякий случай
         await update.message.reply_text(f"⚠️ Ошибка обработки запроса: {e}")
 
 
@@ -83,12 +81,14 @@ async def handle_voice_message(update: Update, context: ContextTypes.DEFAULT_TYP
     user_id = user.id
     voice = update.message.voice
 
-    # ограничим до ~60с
+    # Ограничим до ~60с (синхронный STT)
     if voice and voice.duration and voice.duration > 60:
         await update.message.reply_text(
             "⏱️ Голосовое длиннее 60 сек — укороти, пожалуйста."
         )
         return
+
+    placeholder = await update.message.reply_text("🎙 Пробую распознать вашу болтовню…")
 
     try:
         tg_file = await context.bot.get_file(voice.file_id)
@@ -98,21 +98,53 @@ async def handle_voice_message(update: Update, context: ContextTypes.DEFAULT_TYP
         await tg_file.download_to_memory(out=buf)
         audio_bytes = buf.getvalue()
 
-        # Распознаём
         text = await transcribe_oggopus(audio_bytes)
         if not text:
-            await update.message.reply_text(
-                "😕 Не удалось распознать голос. Попробуй ещё раз."
-            )
+            try:
+                await placeholder.edit_text(
+                    "😕 Не удалось распознать голос. Попробуй ещё раз."
+                )
+            except Exception:
+                await update.message.reply_text(
+                    "😕 Не удалось распознать голос. Попробуй ещё раз."
+                )
             return
+
+        # Покажем, что распознали, и что теперь «думаем»
+        try:
+            await placeholder.edit_text(f"🎤 Распознал: «{text}»\n\n🤔 Думаем…")
+        except Exception:
+            # если редактирование не удалось — не критично
+            pass
 
         ai_reply = await ask_groq(text, user_id)
         reply = ai_reply or "✅ Принято, без ответа."
-        await update.message.reply_text(f"🎤 Распознал: «{text}»\n\n{reply}")
+
+        await placeholder.edit_text(reply)
+
+    except (RetryAfter, TimedOut):
+        # Telegram притормозил — отправим новое сообщение
+        await update.message.reply_text("⏳ Сервер отвечает дольше обычного...")
+        try:
+            # если уже есть ai_reply — шлём его, иначе просто квиток
+            await update.message.reply_text(
+                ai_reply if "ai_reply" in locals() and ai_reply else "✅ Принято."
+            )
+        except Exception:
+            pass
+
+    except BadRequest as e:
+        # Например, сообщение уже удалено/устарело — шлём отдельным
+        await update.message.reply_text(
+            ai_reply if "ai_reply" in locals() and ai_reply else f"⚠️ {e}"
+        )
 
     except Exception as e:
         logging.exception(f"Voice handling failed: {e}")
-        await update.message.reply_text("⚠️ Ошибка обработки голосового сообщения.")
+        try:
+            await placeholder.edit_text("⚠️ Ошибка обработки голосового сообщения.")
+        except Exception:
+            await update.message.reply_text("⚠️ Ошибка обработки голосового сообщения.")
 
 
 async def handle_unknown_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
