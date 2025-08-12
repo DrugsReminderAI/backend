@@ -40,7 +40,6 @@ async def ask_groq(user_text: str, user_id: int) -> str:
             response = await client.chat.completions.create(
                 model=OPENAI_MODEL,
                 messages=chat_history,
-                temperature=TEMPERATURE,
                 tools=TOOLS,
                 tool_choice="auto",
                 parallel_tool_calls=True,
